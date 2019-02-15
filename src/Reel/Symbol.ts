@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js'
+import { TweenLite, TimelineLite } from 'gsap';
 
 export class SymbolContainer extends PIXI.Container {
     /**
@@ -22,5 +23,20 @@ export class SymbolContainer extends PIXI.Container {
         this.symbol.position.set(size/2, size/2);
         this.symbol.anchor.set(0.5);
         this.addChild(this.symbol);
+    }
+    /**
+     * Animate when win
+     */
+    animate(delay: number = 0) {
+        new TimelineLite()
+        .to(this.symbol.scale, 0.5, {
+            x: 1.2,
+            y: 1.2,
+            delay
+        })
+        .to(this.symbol.scale, 0.5, {
+            x: 1,
+            y: 1
+        })
     }
 }

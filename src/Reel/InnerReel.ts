@@ -20,6 +20,8 @@ export class InnerReel extends PIXI.Container {
     private wrapTopPosition: number;
     private wrapLength: number;
 
+    private symbolContainers: Array<SymbolContainer> = [];
+
     constructor(
         /**
          * Order of symbols on the reel
@@ -93,16 +95,18 @@ export class InnerReel extends PIXI.Container {
             nextIndexWithRounds -= this.symbolOrder.length
         }
         this.currentTimeline = new TimelineLite()
+            .add(() => this.emit("started"))
             .set(this, {
                 scrollPositiony: this.getScrollPositionFromIndex(fromIndex)
             })
-            .to(this, duration * 1.2, {
+            .to(this, duration * 1.5, {
                 scrollPosition: this.getScrollPositionFromIndex(nextIndexWithRounds),
                 ease: Expo.easeOut
             })
             .set(this, {
                 currentIndex: toIndex
             })
+            .add(() => this.emit("finished"))
             .add(() => this.emit("enabled"))
             .add(() => this.emit("enabled"), 0.5);
 
@@ -122,11 +126,13 @@ export class InnerReel extends PIXI.Container {
      * @returns.repeatedSymbolName - The symbol that is repeated on the reel
      * @returns.amountOfRepeats    - The amount of that symbol visible on the reel
      * @returns.symbolIndexes      - The index (0-2) of that symbol on the visible reel
+     * @returns.symbolContainers   - The symbol container of that symbol on the visible reel
      */
     public getMatches(): {
         repeatedSymbolName: string, 
         amountOfRepeats: number,
         symbolIndexes: Array<number>,
+        symbolContainers: Array<SymbolContainer>,
     } {
         const symbols = this.getSymbols();
         const counts = countBy(symbols);
@@ -141,17 +147,27 @@ export class InnerReel extends PIXI.Container {
          * Find the indexes of the repeated symbol
          */
         const symbolIndexes = symbols.reduce<Array<number>>((indexes, symbolName, index) => {
-            if (symbolName == repeatedSymbolName)
-            return [
-                ...indexes,
-                index
-            ];
-        }, [])
+            if (symbolName == repeatedSymbolName) {
+                return [
+                    ...indexes,
+                    index
+                ];
+            } else {
+                return indexes;
+            }
+        }, []);
+        /**
+         * Symbol containers of repeated symbols
+         */
+        const symbolContainers = symbolIndexes.map(index => {
+            return this.symbolContainers[this.currentIndex + index]
+        })
 
         return {
             repeatedSymbolName, 
             amountOfRepeats,
             symbolIndexes,
+            symbolContainers,
         };
     }
 
@@ -207,7 +223,7 @@ export class InnerReel extends PIXI.Container {
          * so that when we render the first 3 symbols, 
          * we will see those 3 as wrap effect
          */
-        [
+        const symbolContainers = [
             ...this.symbolOrder.slice(-3),
             ...this.symbolOrder,
         ]
@@ -215,6 +231,8 @@ export class InnerReel extends PIXI.Container {
          * Create the SymbolContainer for each symbol
          */
         .map(symbolContainerCreator);
+
+        this.symbolContainers = symbolContainers.slice(3);
     }
     /**
      * Create a function to create SymbolContainer from symbolName and index
@@ -230,6 +248,7 @@ export class InnerReel extends PIXI.Container {
             symbolContainer.y = (index - offset) * this.size;
 
             this.addChild(symbolContainer);
+            return symbolContainer;
         }
     }
 }

@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { Reel } from './Reel/Reel';
+import { Panel } from './UI/Panel';
 
 export const app = new PIXI.Application({
     width : window.innerWidth,
@@ -8,7 +9,10 @@ export const app = new PIXI.Application({
 
 
 const reel = new Reel();
-app.stage.addChild(reel)
+app.stage.addChild(reel);
+
+const panel = new Panel();
+app.stage.addChild(panel);
 
 const onResize = () => {
     app.renderer.resize(
@@ -16,9 +20,16 @@ const onResize = () => {
         window.innerHeight
     );
     reel.position.set(
+        window.innerWidth/3, 
+        window.innerHeight/2
+    );
+    panel.position.set(
         window.innerWidth/2, 
         window.innerHeight/2
     );
+
+    reel.on("spin", panel.spin, panel)
+    reel.on("win", panel.win, panel)
     
 }
 /**
