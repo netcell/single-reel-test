@@ -6,10 +6,18 @@ export const app = new PIXI.Application({
     height: window.innerHeight
 });
 
+
+const reel = new Reel();
+app.stage.addChild(reel)
+
 const onResize = () => {
     app.renderer.resize(
         window.innerWidth, 
         window.innerHeight
+    );
+    reel.position.set(
+        window.innerWidth/2, 
+        window.innerHeight/2
     );
     
 }
