@@ -56,12 +56,20 @@ export class InnerReel extends PIXI.Container {
         })
         loader.load(this.handleResourceLoaded);
     }
-
-    public roll = () => {
+    /**
+     * Take a random position and spinning to that position
+     */
+    public spin = () => {
         const randomIndex = random(this.symbolOrder.length);
-        this.scrollTo(randomIndex);
+        return this.scrollTo(randomIndex);
     }
-    
+    /**
+     * Quick stop
+     */
+    public fastForward(timeScale: number = 5) {
+        this.emit("quickstop");
+        this.currentTimeline.timeScale(timeScale);
+    }
     /**
      * Create and start a GSAP timeline that animate rolling the inner reel
      * from a symbol to another symbol
@@ -76,7 +84,7 @@ export class InnerReel extends PIXI.Container {
         /** Target symbol */
         toIndex: number,
         /** Number of rounds to roll, the higher this value, the faster the reel rolls */
-        numberOfRounds: number = 1,
+        numberOfRounds: number = 0,
         /** Duration to roll, the lower this value, the faster the reel rolls */
         duration: number = 3,
         /** Original index, default to the current index */
@@ -111,9 +119,6 @@ export class InnerReel extends PIXI.Container {
             .add(() => this.emit("enabled"), 0.5);
 
         return this.currentTimeline;
-    }
-    public fastForward(timeScale: number = 5) {
-        this.currentTimeline.timeScale(timeScale);
     }
     /**
      * Get the list of visible symbols at the current index
@@ -160,7 +165,7 @@ export class InnerReel extends PIXI.Container {
          * Symbol containers of repeated symbols
          */
         const symbolContainers = symbolIndexes.map(index => {
-            return this.symbolContainers[this.currentIndex + index]
+            return this.symbolContainers[(this.currentIndex + index) % this.symbolOrder.length]
         })
 
         return {
@@ -209,7 +214,7 @@ export class InnerReel extends PIXI.Container {
         } else {
             return [
                 ...symbolOrder.slice(index),
-                ...symbolOrder.slice(0, symbolOrder.length - index),
+                ...symbolOrder.slice(0, 3 - (symbolOrder.length - index)),
             ]
         }
     }

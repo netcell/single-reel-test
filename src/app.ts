@@ -28,8 +28,10 @@ const onResize = () => {
         window.innerHeight/2
     );
 
-    reel.on("spin", panel.spin, panel)
-    reel.on("win", panel.win, panel)
+    reel.on("spin", panel.spin, panel);
+    reel.on("win", panel.win, panel);
+    reel.on("lose", panel.lose, panel);
+    panel.on("bankrupt", reel.disable, reel);
     
 }
 /**

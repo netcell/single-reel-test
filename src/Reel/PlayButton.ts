@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js'
-import { TweenLite, TimelineLite } from 'gsap';
+import { TweenLite, TweenMax, Linear } from 'gsap';
 
 export class PlayButton extends PIXI.Sprite {
+    private spinTween: TweenLite;
+
     constructor(
         private enabledTexture: PIXI.Texture,
         private disabledTexture: PIXI.Texture,
@@ -17,12 +19,27 @@ export class PlayButton extends PIXI.Sprite {
         this.on('pointerup', this.hanldeMouseOut, this)
     }
 
-    enable() {
+    public spin() {
+        this.spinTween = TweenMax.to(this, 0.5, {
+            rotation: 2 * Math.PI,
+            repeat: -1,
+            ease: Linear.easeNone,
+        })
+    }
+
+    public stopSpin() {
+        this.spinTween && this.spinTween.kill();
+        this.spinTween = TweenMax.to(this, 0.5, {
+            rotation: 0,
+        })
+    }
+
+    public enable() {
         this.interactive = true;
         this.buttonMode = true;
         this.texture = this.enabledTexture;
     }
-    disable() {
+    public disable() {
         this.interactive = false;
         this.buttonMode = false;
         this.texture = this.disabledTexture;

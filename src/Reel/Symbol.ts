@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { TweenLite, TimelineLite } from 'gsap';
+import { TimelineLite } from 'gsap';
 
 export class SymbolContainer extends PIXI.Container {
     /**
@@ -30,13 +30,26 @@ export class SymbolContainer extends PIXI.Container {
     animate(delay: number = 0) {
         new TimelineLite()
         .to(this.symbol.scale, 0.5, {
-            x: 1.2,
-            y: 1.2,
+            x: 1.3,
+            y: 1.3,
             delay
         })
+        .to(this.symbol, 0.25, {
+            rotation: Math.PI/6,
+            delay
+        }, 0)
+        .to(this.symbol, 0.25, {
+            rotation: -Math.PI/6,
+            delay
+        }, 0.25)
+        .to(this.symbol, 0.25, {
+            rotation: 0,
+            delay
+        }, 0.5)
         .to(this.symbol.scale, 0.5, {
             x: 1,
             y: 1
-        })
+        }, 0.5)
+        
     }
 }

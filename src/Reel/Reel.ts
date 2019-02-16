@@ -12,7 +12,8 @@ export class Reel extends PIXI.Container {
     /**
      * The moving reel
      */
-    public innerReel: InnerReel;
+    private innerReel: InnerReel;
+    private playButton: PlayButton;
     private background: PIXI.Sprite;
     private winBackgrounds: Array<PIXI.Sprite>;
 
@@ -36,8 +37,11 @@ export class Reel extends PIXI.Container {
             .load(this.handleResourceLoaded);
     }
 
+    public disable() {
+        this.playButton.disable();
+    }
+
     private handleResourceLoaded = (loader: PIXI.loaders.Loader, resources: PIXI.loaders.ResourceDictionary) => {
-        const BACKGROUND_PADDING = this.BACKGROUND_PADDING;
         /**
          * The background of the reel
          */
@@ -55,13 +59,13 @@ export class Reel extends PIXI.Container {
          */
         this.innerReel = this.createInnerReel();
 
-        const playButton = this.createPlayButton(resources);
-        
-        playButton.on('pointerup', this.innerReel.roll);
-        this.innerReel.on('enabled', playButton.enable, playButton);
-        this.innerReel.on('disabled', playButton.disable, playButton);
+        this.playButton = this.createPlayButton(resources);
+        /** Click to spin */
+        this.playButton.on('pointerup', this.innerReel.spin);
+        /** Hanlde spin start and finish */
         this.innerReel.on('started', this.onSpin, this);
         this.innerReel.on('finished', this.onFinish, this);
+        this.innerReel.on('quickstop', this.playButton.stopSpin, this.playButton);
         
         this.pivot.set(
             this.background.width/2, 
@@ -74,6 +78,7 @@ export class Reel extends PIXI.Container {
      */
     private onFinish() {
         const matches = this.innerReel.getMatches();
+        this.playButton.stopSpin();
         if (matches) {
             matches.symbolIndexes.forEach(index => {
                 this.winBackgrounds[index].visible = true;
@@ -82,6 +87,8 @@ export class Reel extends PIXI.Container {
                 symbolContainer.animate();
             })
             this.emit("win", matches.amountOfRepeats);
+        } else {
+            this.emit("lose");
         }
     }
     /**
@@ -92,6 +99,7 @@ export class Reel extends PIXI.Container {
         this.winBackgrounds.forEach(winBackground => {
             winBackground.visible = false;
         });
+        this.playButton.spin();
         this.emit("spin");
     }
     /**
