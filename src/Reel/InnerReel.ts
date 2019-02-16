@@ -90,7 +90,6 @@ export class InnerReel extends PIXI.Container {
         /** Original index, default to the current index */
         fromIndex: number = this.currentIndex,
     ): TimelineLite {
-        this.emit("disabled")
         if (this.currentTimeline && this.currentTimeline.progress() != 1) {
             this.fastForward();
             return this.currentTimeline;
@@ -114,9 +113,7 @@ export class InnerReel extends PIXI.Container {
             .set(this, {
                 currentIndex: toIndex
             })
-            .add(() => this.emit("finished"))
-            .add(() => this.emit("enabled"))
-            .add(() => this.emit("enabled"), 0.5);
+            .add(() => this.emit("finished"));
 
         return this.currentTimeline;
     }
