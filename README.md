@@ -1,6 +1,13 @@
 # SINGLE REEL
 
-Single reel slot machine game made with [PIXI.js](http://www.pixijs.com/), [GSAP](https://greensock.com/gsap), [Lodash](https://lodash.com), [Typescript](https://www.typescriptlang.org/) and bundled with [Parcel](https://parceljs.org/). 
+Single reel slot machine game made with:
+
+- [PIXI.js](http://www.pixijs.com/) (for rendering), 
+- [GSAP](https://greensock.com/gsap) (for animation), 
+- [Lodash](https://lodash.com) (for readability), 
+- [numeral](http://numeraljs.com/) (for formating number), 
+- [Typescript](https://www.typescriptlang.org/) (with decorator), and 
+- [Parcel](https://parceljs.org/) (for bundling).
 
 # SETUP
 
