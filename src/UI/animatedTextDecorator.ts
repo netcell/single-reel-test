@@ -1,12 +1,13 @@
 import { TweenLite } from "gsap";
+import numeral from 'numeral';
 /**
  * Animated Text Decorator
  * Turn a number field into get set property
  * where setting the number results in a text field (`this[textField]`) has its text animated toward that value
- * @param textField the field name of the text field
+ * @param textFieldName the field name of the text field
  * @param preProcessValue an optional function that allows preprocessing the value prior to passing it to setter
  */
-export function animatedNumber(textField: string, preProcessValue?: (current: number, next: number) => number) {
+export function animatedNumber(textFieldName: string, preProcessValue?: (current: number, next: number) => number) {
     return function (target: any, key: string) {
         let _value: number = target[key];
     
@@ -14,6 +15,7 @@ export function animatedNumber(textField: string, preProcessValue?: (current: nu
             return _value;
         };
         const setter = function (value: number) {
+            const prevValue = _value;
             /**
              * Preprocess value
              */
@@ -25,10 +27,15 @@ export function animatedNumber(textField: string, preProcessValue?: (current: nu
             /**
              * Animate the text field
              */
-            if (this[textField]) {
-                TweenLite.to(this[textField], 0.5, {
-                    text: _value,
-                    roundProps: "text",
+            const textField = this[textFieldName];
+            if (textField) {
+                const valueObject = { value: prevValue };
+                TweenLite.to(valueObject, 0.5, {
+                    value: _value,
+                    roundProps: "value",
+                    onUpdate: () => {
+                        textField.text = numeral(valueObject.value).format('0,0');
+                    }
                 });
             }
         };
